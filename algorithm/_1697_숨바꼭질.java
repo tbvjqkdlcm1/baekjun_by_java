@@ -3,14 +3,15 @@ package algorithm;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
 import java.util.StringTokenizer;
 
 public class _1697_숨바꼭질 {
     private static int N;
     private static int K;
     private static StringTokenizer st;
-    private static int min;
-    private static int count = 0;
+    private static int[] visited = new int[100001];
+    private static ArrayDeque<Integer> queue = new ArrayDeque<>();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -18,28 +19,34 @@ public class _1697_숨바꼭질 {
         N = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
 
-        min = K-N;
-        fx(N, count);
-
-        System.out.println(count);
+        System.out.println(bfs(N));
     }
 
-    public static void fx(int N, int count) {
-        if (N == K) {
-            min = Math.min(min, count);
-            return;
+    private static int bfs(int N) {
+        queue.add(N);
+        visited[N] = 1;
+        int idx;
+        while (!queue.isEmpty()) {
+            idx = queue.pop();
+            if (idx == K) {
+                return visited[idx]-1;
+            }
+            if (idx-1 >= 0 && visited[idx-1] == 0) {
+                visited[idx-1] = visited[idx] + 1;
+                queue.add(idx-1);
+            }
+            if (idx+1 <= 100000 && visited[idx+1] == 0) {
+                visited[idx+1] = visited[idx] + 1;
+                queue.add(idx+1);
+            }
+            if (idx*2 <= 100000 && visited[idx*2] == 0) {
+                visited[idx*2] = visited[idx] + 1;
+                queue.add(idx*2);
+            }
         }
-        if (count > min) {
-            return;
-        }
-        if (N-1 >= 0 || N > K) {
-            fx(N-1, count+1);
-        }
-        if (0 <= N && N < K ) {
-            fx(N+1, count+1);
-            fx(N*2, count+1);
-        }
+        return -1;
     }
 }
-// 5 -> 6 7 8 9 10 11
-// 5 -> 1 2 3 2 1 1+1
+//         1 2 3 4 5 6 7 8 9 10
+// visited 5 4 3 2 1 2 3 4 5  6
+// visited 5 4 3 2 1 2 3 3 3  2
